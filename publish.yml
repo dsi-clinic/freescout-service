@@ -1,0 +1,33 @@
+name: Mirror FreeScout 1.17.146 to CloudFlare Registry
+
+on:
+  workflow_dispatch: 
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Internal Registry
+        run: |
+          echo "${{ secrets.CF_REGISTRY_PASSWORD }}" | docker login "${{ secrets.CF_REGISTRY_URL }}" \
+            --username "${{ secrets.CF_REGISTRY_USERNAME }}" --password-stdin
+
+      - name: Pull upstream FreeScout image
+        run: |
+          docker pull ghcr.io/tiredofit/docker-freescout:php8.3-1.17.146
+
+      - name: Retag for internal registry
+        run: |
+          docker tag \
+            ghcr.io/tiredofit/docker-freescout:php8.3-1.17.146 \
+            ${{ secrets.CF_REGISTRY_URL }}/freescout:1.17.146
+
+          # Immutable tag by commit SHA 
+          docker tag \
+            ghcr.io/tiredofit/docker-freescout:php8.3-1.17.146 \
+            ${{ secrets.CF_REGISTRY_URL }}/freescout:sha-${GITHUB_SHA}
+
+      - name: Push to internal registry
+        run: |
+          docker push ${{ secrets.CF_REGISTRY_URL }}/freescout:1.17.146
+          docker push ${{ secrets.CF_REGISTRY_URL }}/freescout:sha-${GITHUB_SHA}
