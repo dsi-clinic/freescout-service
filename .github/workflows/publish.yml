@@ -9,8 +9,8 @@ jobs:
     steps:
       - name: Login to Internal Registry
         run: |
-          echo "${{ secrets.CF_REGISTRY_PASSWORD }}" | docker login "${{ secrets.CF_REGISTRY_URL }}" \
-            --username "${{ secrets.CF_REGISTRY_USERNAME }}" --password-stdin
+          echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login "${{ secrets.REGISTRY_URL }}" \
+            --username "${{ secrets.REGISTRY_USERNAME }}" --password-stdin
 
       - name: Pull upstream FreeScout image
         run: |
@@ -20,14 +20,13 @@ jobs:
         run: |
           docker tag \
             ghcr.io/tiredofit/docker-freescout:php8.3-1.17.146 \
-            ${{ secrets.CF_REGISTRY_URL }}/freescout:1.17.146
+            ${{ secrets.REGISTRY_URL }}/freescout:1.17.146
 
           # Immutable tag by commit SHA 
           docker tag \
             ghcr.io/tiredofit/docker-freescout:php8.3-1.17.146 \
-            ${{ secrets.CF_REGISTRY_URL }}/freescout:sha-${GITHUB_SHA}
+            ${{ secrets.REGISTRY_URL }}/freescout:sha-${GITHUB_SHA}
 
       - name: Push to internal registry
         run: |
-          docker push ${{ secrets.CF_REGISTRY_URL }}/freescout:1.17.146
-          docker push ${{ secrets.CF_REGISTRY_URL }}/freescout:sha-${GITHUB_SHA}
+          docker push ${{ secrets.REGISTRY_URL }}/freescout:1.17.146
