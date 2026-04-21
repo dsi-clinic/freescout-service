@@ -9,22 +9,17 @@ jobs:
     steps:
       - name: Login to Internal Registry
         run: |
-          echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login "${{ secrets.REGISTRY_URL }}" \
+          echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login "${{ secrets.REGISTRY_URL }}\" \
             --username "${{ secrets.REGISTRY_USERNAME }}" --password-stdin
 
       - name: Pull upstream FreeScout image
         run: |
-          docker pull ghcr.io/tiredofit/docker-freescout:php8.3-latest
+          docker pull tiredofit/freescout:latest
 
       - name: Retag for internal registry
         run: |
-          docker tag \
-            ghcr.io/tiredofit/docker-freescout:php8.3-latest \
-            ${{ secrets.REGISTRY_URL }}/freescout:latest
-
-          docker tag \
-            ghcr.io/tiredofit/docker-freescout:php8.3-latest \
-            ${{ secrets.REGISTRY_URL }}/freescout:sha-${GITHUB_SHA}
+          docker tag tiredofit/freescout:latest ${{ secrets.REGISTRY_URL }}/freescout:latest
+          docker tag tiredofit/freescout:latest ${{ secrets.REGISTRY_URL }}/freescout:sha-${GITHUB_SHA}
 
       - name: Push to internal registry
         run: |
